@@ -4,86 +4,25 @@ All notable changes to this project will be documented in this file.
 
 This changelog follows the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) format and adheres to [Semantic Versioning](https://semver.org/).
 
-## [v2.1] - 2025-10-29
+---
+
+## [v2.1] - 2025-12-26
 
 ### 🚀 Added
 
-#### Dashboard Enhancements
+#### 🖨️ Invoice Print System
+- **QR Code Support**: Added dynamic QR code generation to invoice footer.
+- **Smart Footer**: Implemented grid-based signature layout that remains stable regardless of QR visibility.
+- **Paper Formats**: Optimized CSS for A5, A4, and Letter sizes with overflow protection.
+- **Timestamp**: Added generation timestamp and Invoice ID footer.
 
-- Enhanced the dashboard overview to include:
-  - **Total Invoices** and **Today’s Invoices**
-  - **Total Sales** and **Today’s Sales**
-  - **Total Businesses** and **Logs Count**
-  - **Yesterday’s Sales** and **Yesterday’s Invoice Counts**
-- Introduced filters for **Today**, **Yesterday**, **Daily**, **Monthly**, **Yearly**, and **Custom Date Range (From–To)** with dedicated **Filter** and **Refresh** buttons.
-  - The **Refresh** button retrieves data from session storage if available, otherwise fetches from the API.
-- Added **Business Analytics** section showing:
-  - **Sales Overview Graph**
-  - **Invoices Overview Graph**
-- Implemented **Recent Invoices** cards to display the latest six invoices, including:
-  - Invoice Number, Date, Place, Name, and Amount.
+#### 📊 Dashboard Features
+- **Privacy Mode**: Added toggle to mask sales numbers and blur charts.
+- **Dynamic Payment Logic**: Invoice print view now correctly reflects UPI/NetBanking status.
 
-### 🐞 Fixed
-
-- Added the `updated_at` column to the **business** table.
-
----
-
-## 📘 API Reference
-
-### 🔹 Dashboard Endpoint Response (Modified)
-
-```http
-GET /api/business/stats
-```
-
-**Description:**  
-Updated API response format. Returns aggregated business summary, recent invoices, and chart data for various periods (today, yesterday, daily, monthly, yearly).
-
-#### Example Response
-
-```json
-{
-  "status": true,
-  "message": "Yesterday dashboard stats fetched successfully.",
-  "data": {
-    "summary": {
-      "totalInvoices": 2027,
-      "todayInvoices": 0,
-      "yesterdayInvoices": 1,
-      "totalSales": "6,204,884.50",
-      "todaySales": "0.00",
-      "yesterdaySales": "10.00",
-      "totalBusiness": 1,
-      "totalLogs": 992
-    },
-    "recentInvoices": [
-      {
-        "invoiceId": "CDC3BDE2",
-        "invoiceNumber": 3333,
-        "invoiceDate": "2025-10-28",
-        "name": "ABISHEK",
-        "amount": "10.00",
-        "place": "Tisayanvilai"
-      }
-    ],
-    "chart": {
-      "labels": [16],
-      "invoices": [1],
-      "sales": [10],
-      "period": "yesterday",
-      "fromDate": "2025-10-28",
-      "toDate": "2025-10-28"
-    }
-  },
-  "pagination": {
-    "currentPage": 1,
-    "limit": 1,
-    "totalPages": 1,
-    "totalRecords": 1
-  }
-}
-```
+### 💅 UI Updates
+- **Print Button**: Redesigned print button on invoices list (Yellow/White).
+- **Layout**: Tighter print margins for A5 optimization.
 
 ---
 

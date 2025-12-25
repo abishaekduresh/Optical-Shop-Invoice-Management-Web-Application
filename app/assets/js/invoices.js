@@ -488,6 +488,9 @@ document.addEventListener("DOMContentLoaded", function () {
             <button class="btn btn-sm btn-action update-btn me-1" data-id="${id}">
               <i class="fa-solid fa-pen"></i>
             </button>
+            <button class="btn btn-sm btn-action print-btn me-1 btn-warning text-white" data-id="${id}">
+              <i class="fa-solid fa-print"></i>
+            </button>
             <button class="btn btn-sm btn-action delete-btn" data-id="${id}">
               <i class="fa-solid fa-trash"></i>
             </button>
@@ -503,6 +506,9 @@ document.addEventListener("DOMContentLoaded", function () {
             else if (btn.classList.contains("view-btn")) viewInvoice(rowData);
             else if (btn.classList.contains("update-btn"))
               updateInvoice(rowData);
+            else if (btn.classList.contains("print-btn")) {
+              window.open(`print-invoice.php?id=${rowData.invoiceId}&size=A5`, '_blank');
+            }
             else if (btn.classList.contains("delete-btn"))
               openDeleteModal(rowData);
           },
@@ -643,7 +649,23 @@ Thank you!
       inv.invoiceNumber || "";
     document.getElementById("updateInvoiceDate").value = inv.invoiceDate || "";
     document.getElementById("updateInvoiceDob").value = inv.dob || "";
-    document.getElementById("updateInvoicePlace").value = inv.place || "";
+    document.getElementById("updateInvoiceDob").value = inv.dob || "";
+    // Handle Place Select2 logic
+    const placeVal = inv.place || "";
+    if ($("#updateInvoicePlace").hasClass("select2-hidden-accessible")) {
+      if (
+        placeVal &&
+        $("#updateInvoicePlace").find(`option[value='${placeVal}']`).length ===
+          0
+      ) {
+        const newOption = new Option(placeVal, placeVal, true, true);
+        $("#updateInvoicePlace").append(newOption).trigger("change");
+      } else {
+        $("#updateInvoicePlace").val(placeVal).trigger("change");
+      }
+    } else {
+        $("#updateInvoicePlace").val(placeVal);
+    }
     document.getElementById("updateInvoiceAmount").value = inv.amount || "";
     document.getElementById("updateInvoiceOffer").value = inv.offer || "";
     document.getElementById("updateInvoiceClaim").value = inv.claim || "";
@@ -760,6 +782,102 @@ Thank you!
     },
   });
 
+  // Initialize Select2 for Place
+  $("#createInvoicePlace").select2({
+    theme: "bootstrap-5",
+    placeholder: "Search or enter place...",
+    allowClear: true,
+    tags: true, // Allow custom values
+    dropdownParent: $("#createInvoiceStaticBackdropModal"),
+    ajax: {
+      transport: function (params, success, failure) {
+        const searchTerm = params.data.term || "";
+        apiRequest(
+          "GET",
+          "/api/invoices",
+          { q: searchTerm, limit: 50 },
+          false,
+          (res) => {
+            const data = res.data?.invoices || [];
+            // Deduplicate places
+            const seen = new Set();
+            const results = [];
+            data.forEach((inv) => {
+              if (inv.place) {
+                const p = inv.place.trim();
+                const lower = p.toLowerCase();
+                if (!seen.has(lower)) {
+                  seen.add(lower);
+                  results.push({
+                    id: p,
+                    text: StringUtils.toTitleCase(p),
+                  });
+                }
+              }
+            });
+            // Limit to 5 results as requested
+            success({ results: results.slice(0, 5) });
+          },
+          (xhr) => {
+            console.error("Place fetch error:", xhr);
+            failure();
+          }
+        );
+      },
+      delay: 300,
+      processResults: (data) => data,
+      cache: true,
+    },
+  });
+  
+  // Initialize Select2 for updateInvoice Place
+  $("#updateInvoicePlace").select2({
+    theme: "bootstrap-5",
+    placeholder: "Search or enter place...",
+    allowClear: true,
+    tags: true, // Allow custom values
+    dropdownParent: $("#updateInvoiceModal"),
+    ajax: {
+      transport: function (params, success, failure) {
+        const searchTerm = params.data.term || "";
+        apiRequest(
+          "GET",
+          "/api/invoices",
+          { q: searchTerm, limit: 50 },
+          false,
+          (res) => {
+            const data = res.data?.invoices || [];
+            // Deduplicate places
+            const seen = new Set();
+            const results = [];
+            data.forEach((inv) => {
+              if (inv.place) {
+                const p = inv.place.trim();
+                const lower = p.toLowerCase();
+                if (!seen.has(lower)) {
+                  seen.add(lower);
+                  results.push({
+                    id: p,
+                    text: StringUtils.toTitleCase(p),
+                  });
+                }
+              }
+            });
+            // Limit to 5 results as requested
+            success({ results: results.slice(0, 5) });
+          },
+          (xhr) => {
+            console.error("Place fetch error:", xhr);
+            failure();
+          }
+        );
+      },
+      delay: 300,
+      processResults: (data) => data,
+      cache: true,
+    },
+  });
+
   // Focus the input field when Select2 opens
   $("#createInvoiceSearchInput").on("select2:open", () => {
     setTimeout(() => {
@@ -778,7 +896,9 @@ Thank you!
 
     $("#createInvoiceName").val(selectedItem.name || "");
     $("#createInvoicePhone").val(selectedItem.phone || "");
-    $("#createInvoicePlace").val(selectedItem.place || "");
+    $("#createInvoiceName").val(selectedItem.name || "");
+    $("#createInvoicePhone").val(selectedItem.phone || "");
+    // $("#createInvoicePlace").val(selectedItem.place || ""); // Handled below for Select2
     let dob = selectedItem.dob || "";
     // Validate DOB format — skip invalid or placeholder dates
     if (!dob || dob === "0000-00-00" || dob === "null" || dob === null) {
@@ -794,6 +914,24 @@ Thank you!
       $("#createInvoiceDob").val("");
       $("#createInvoiceAge").val("");
     }
+
+    // Update Place Select2 if exists
+    const placeVal = selectedItem.place || "";
+    if ($("#createInvoicePlace").hasClass("select2-hidden-accessible")) {
+      // Create option if it doesn't exist to ensure it shows up
+      if (
+        placeVal &&
+        $("#createInvoicePlace").find(`option[value='${placeVal}']`).length ===
+          0
+      ) {
+        const newOption = new Option(placeVal, placeVal, true, true);
+        $("#createInvoicePlace").append(newOption).trigger("change");
+      } else {
+        $("#createInvoicePlace").val(placeVal).trigger("change");
+      }
+    } else {
+      $("#createInvoicePlace").val(placeVal);
+    }
   });
 });
 
@@ -804,10 +942,17 @@ let selectedInput = null;
  */
 function createAndAppendButton(grid, value, type, inputElement) {
   const isVision = type === "via";
+  const isZero = value === "0.00" || value === "+0.00" || value === "-0.00";
+
   const btn = document.createElement("button");
-  btn.className = `btn btn-sm ${
-    isVision ? "btn-outline-success" : "btn-outline-primary"
-  } optical-value-btn`;
+  let btnClass = "btn btn-sm optical-value-btn ";
+
+  // Special high-contrast style for 0.00
+  if (isZero) btnClass += "btn-outline-dark fw-bold border-2";
+  else if (isVision) btnClass += "btn-outline-success";
+  else btnClass += "btn-outline-primary";
+
+  btn.className = btnClass;
   btn.textContent = value;
   btn.setAttribute("data-value", value); // Store the raw value for matching
 
@@ -834,13 +979,14 @@ function generateOpticalValues(type) {
   switch (type) {
     case "sph":
     case "cyl":
-      start = type === "sph" ? -20.0 : -10.0;
-      end = type === "sph" ? 20.0 : 10.0;
+      // Positive to Negative range as requested
+      start = type === "sph" ? 20.0 : 10.0;
+      end = type === "sph" ? -20.0 : -10.0;
       step = 0.25;
       for (
         let val = start;
-        val <= end;
-        val = Math.round((val + step) * 100) / 100
+        val >= end;
+        val = Math.round((val - step) * 100) / 100
       ) {
         let formatted = val.toFixed(2);
         values.push((val > 0 ? "+" : "") + formatted);
@@ -1007,23 +1153,37 @@ function showPicker(input) {
   // Clear all previous highlights
   buttons.forEach((btn) => {
     btn.classList.remove("btn-primary");
-    // Re-apply correct outline class
-    const typeClass = btn.getAttribute("data-value").includes("/")
-      ? "btn-outline-success"
-      : "btn-outline-primary";
-    btn.classList.add(typeClass);
+
+    // Remove all potential classes to ensure clean state
+    btn.classList.remove("btn-outline-primary", "btn-outline-success", "btn-outline-dark", "fw-bold", "border-2");
+
+    const val = btn.getAttribute("data-value");
+    if (val === "0.00" || val === "+0.00" || val === "-0.00") {
+        btn.classList.add("btn-outline-dark", "fw-bold", "border-2");
+    } else if (val.includes("/")) {
+        btn.classList.add("btn-outline-success");
+    } else {
+        btn.classList.add("btn-outline-primary");
+    }
   });
 
   if (targetButton) {
     // Apply Highlight
-    targetButton.classList.remove("btn-outline-primary", "btn-outline-success");
+    targetButton.classList.remove("btn-outline-primary", "btn-outline-success", "btn-outline-dark", "fw-bold", "border-2");
     targetButton.classList.add("btn-primary");
+  }
 
-    const buttonHeight = targetButton.offsetHeight;
+  // Scroll to target button or default to 0.00 (centered)
+  const scrollTarget =
+    targetButton ||
+    buttons.find((btn) => btn.getAttribute("data-value") === "0.00");
+
+  if (scrollTarget) {
+    const buttonHeight = scrollTarget.offsetHeight;
     const pickerHeight = picker.clientHeight;
 
     const scrollOffset =
-      targetButton.offsetTop - pickerHeight / 2 + buttonHeight / 2;
+      scrollTarget.offsetTop - pickerHeight / 2 + buttonHeight / 2;
     picker.scrollTop = scrollOffset;
   } else {
     picker.scrollTop = 0;

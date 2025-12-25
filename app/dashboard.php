@@ -11,6 +11,10 @@ include_once 'header.php';
       <i class="fa fa-chart-bar me-2"></i>Dashboard Overview
     </h4>
     <div class="d-flex align-items-center gap-2">
+      <button id="toggleDataBtn" class="btn btn-sm btn-outline-secondary" title="Show/Hide Data">
+        <i class="fa fa-eye-slash"></i>
+      </button>
+
       <select id="periodSelect" class="form-select form-select-sm">
         <option value="today" selected>Today</option>
         <option value="yesterday">Yesterday</option>
@@ -163,7 +167,7 @@ include_once 'header.php';
   </div>
 </div>
 
-  <script src="<?= $base_url ?>assets/js/dashboard.js"></script>
+  <script src="<?= $base_url ?>assets/js/dashboard.js?v=v3"></script>
 
 <?php
   include_once 'footer.php';

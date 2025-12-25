@@ -1,5 +1,7 @@
 $(document).ready(function () {
   const DASHBOARD_KEY = "dashboardStats";
+  // Default isHidden to true (hide by default)
+  let isHidden = true;
 
   // ================== RENDERERS ==================
   function renderRecentInvoices(invoices = []) {
@@ -44,7 +46,7 @@ $(document).ready(function () {
               <i class="fa fa-user me-2 text-secondary"></i>${inv.name}
             </h6>
             <h5 class="fw-bold text-success mb-0">
-              ₹${parseFloat(inv.amount).toLocaleString()}
+              ₹${isHidden ? "****" : parseFloat(inv.amount).toLocaleString()}
             </h5>
           </div>
         </div>
@@ -57,17 +59,26 @@ $(document).ready(function () {
   function renderDashboard(summary, invoices) {
     if (!summary) return;
 
+    const mask = (val) => (isHidden ? "******" : val);
+
     $("#totalInvoices").text(summary.totalInvoices ?? 0);
     $("#todayInvoices").text(summary.todayInvoices ?? 0);
     $("#totalBusiness").text(summary.totalBusiness ?? 0);
     $("#totalLogs").text(summary.totalLogs ?? 0);
-    $("#totalSales").text(summary.totalSales ?? "0.00");
-    $("#todaySales").text(summary.todaySales ?? "0.00");
-    $("#yesterdaySales").text(summary.yesterdaySales ?? "0.00");
+    
+    // Mask sensitive sales data
+    $("#totalSales").text(mask(summary.totalSales ?? "0.00"));
+    $("#todaySales").text(mask(summary.todaySales ?? "0.00"));
+    $("#yesterdaySales").text(mask(summary.yesterdaySales ?? "0.00"));
     $("#yesterdayInvoices").text(summary.yesterdayInvoices ?? 0);
+
+    // Update charts visibility
+    updateChartVisibility();
 
     renderRecentInvoices(invoices || []);
   }
+
+
 
   function renderCharts(chart) {
     if (!chart || !chart.labels) return;
@@ -129,6 +140,16 @@ $(document).ready(function () {
         scales: { y: { beginAtZero: true } },
       },
     });
+
+    updateChartVisibility();
+  }
+
+  function updateChartVisibility() {
+    const filter = isHidden ? "blur(6px)" : "none";
+    if (window.salesChartInstance) {
+      window.salesChartInstance.canvas.style.filter = filter;
+      window.salesChartInstance.canvas.style.transition = "filter 0.3s ease";
+    }
   }
 
   // ================== FETCH DASHBOARD DATA ==================
@@ -186,16 +207,9 @@ $(document).ready(function () {
   // ================== EVENT HANDLERS ==================
   $("#refreshDashboardBtn").click(function () {
     const $btn = $(this);
-    $btn.prop("disabled", true).html('<i class="fa fa-spinner fa-spin"></i>'); // Refreshing...
+    $btn.prop("disabled", true).html('<i class="fa fa-spinner fa-spin"></i>'); //  Refreshing...
 
-    const cached = sessionStorage.getItem(DASHBOARD_KEY);
-    if (cached) {
-      const data = JSON.parse(cached);
-      renderDashboard(data.summary, data.recentInvoices);
-      renderCharts(data.chart);
-    } else {
-      fetchDashboardData(false);
-    }
+    fetchDashboardData();
 
     // Use unique timeout key
     setUniqueTimeout(
@@ -217,10 +231,32 @@ $(document).ready(function () {
     setUniqueTimeout(
       "applyFilter",
       () => {
-        $btn.prop("disabled", false).html('<i class="fa fa-filter me-1"></i>'); // Apply
+        $btn.prop("disabled", false).html('<i class="fa fa-filter me-1"></i>'); //  Apply
       },
       2500
     );
+  });
+
+  // Toggle Visibility
+  $("#toggleDataBtn").click(function() {
+    isHidden = !isHidden;
+    const btn = $(this);
+    if(isHidden) {
+      btn.html('<i class="fa fa-eye-slash"></i>');
+    } else {
+      btn.html('<i class="fa fa-eye"></i>');
+    }
+
+    updateChartVisibility();
+
+    // Re-render UI with current data in memory
+
+    // Re-render UI with current data in memory
+    const cached = sessionStorage.getItem(DASHBOARD_KEY);
+    if (cached) {
+        const data = JSON.parse(cached);
+        renderDashboard(data.summary, data.recentInvoices);
+    }
   });
 
   // ================== INITIAL LOAD ==================

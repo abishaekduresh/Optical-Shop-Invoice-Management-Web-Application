@@ -2,7 +2,7 @@ $(function () {
   // State
   let state = {
     page: 1,
-    limit: 25,
+    limit: 10,
     order: "DESC",
     query: "",
     lastResponse: null,
@@ -140,7 +140,7 @@ $(function () {
     // Build query params for GET request
     const params = {
       page: state.page,
-      limit: state.limit,
+      limit: state.limit ?? 10,
       ord: state.order,
     };
     if (state.query) params.q = state.query;

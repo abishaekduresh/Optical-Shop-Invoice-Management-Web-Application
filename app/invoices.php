@@ -233,7 +233,7 @@ include_once 'header.php';
                     <div class="row g-3 mb-3 align-items-end">
                     <div class="col-md-3">
                         <label for="createInvoicePlace" class="form-label">Place</label>
-                        <input type="text" class="form-control shadow-sm" id="createInvoicePlace" name="createInvoicePlace" placeholder="Enter place">
+                        <select class="form-select shadow-sm" id="createInvoicePlace" name="createInvoicePlace" style="width: 100%;"></select>
                     </div>
 
                     <div class="col-md-2">
@@ -551,7 +551,7 @@ include_once 'header.php';
                             <div class="row g-3 mb-3 align-items-end">
                                 <div class="col-md-3">
                                     <label for="updateInvoicePlace" class="form-label">Place</label>
-                                    <input type="text" class="form-control shadow-sm" id="updateInvoicePlace" name="updateInvoicePlace" placeholder="Enter place">
+                                    <select class="form-select shadow-sm" id="updateInvoicePlace" name="updateInvoicePlace" style="width: 100%;"></select>
                                 </div>
 
                                 <div class="col-md-2">
@@ -712,7 +712,7 @@ include_once 'header.php';
 
 </div>
 
-  <script src="./assets/js/invoices.js"></script>
+  <script src="./assets/js/invoices.js?v=<?= time() ?>"></script>
 
 <?php
   include_once 'footer.php';

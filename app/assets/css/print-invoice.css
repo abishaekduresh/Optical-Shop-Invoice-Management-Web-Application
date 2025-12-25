@@ -1,0 +1,265 @@
+/* Base Reset */
+* {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: #555; /* Page background for viewing */
+    font-family: 'Roboto', sans-serif;
+}
+
+.no-print {
+    padding: 10px;
+    background: #fff;
+    text-align: center;
+    border-bottom: 1px solid #ccc;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+/* Paper Sheet */
+.sheet {
+    background: #222; /* Specific dark background from image */
+    color: #fff;
+    margin: 20px auto;
+    padding: 10mm;
+    position: relative;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    overflow: hidden;
+}
+
+/* Paper Sizes */
+.sheet.A4 { width: 210mm; min-height: 297mm; }
+.sheet.A5 { width: 148mm; min-height: 210mm; }
+.sheet.Letter { width: 216mm; min-height: 279mm; }
+
+/* In Print, remove margins/shadows/background of body */
+@media print {
+    body { background: none; }
+    .no-print { display: none; }
+    .sheet {
+        margin: 0;
+        box-shadow: none;
+        width: 100% !important; 
+        height: auto !important; /* Allow growing if content overflows, though fixed is better for carbon copy feel */
+        page-break-after: always;
+    }
+    @page {
+        margin: 0;
+    }
+}
+
+/* Header */
+.invoice-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+.brand-text {
+    text-align: center;
+}
+.rainbow-text {
+    font-size: 24pt;
+    font-weight: 900;
+    margin: 0;
+    letter-spacing: 1px;
+    background: linear-gradient(to right, #ff0000, #ff9900, #ffff00, #33cc33, #0099ff);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 1px 1px 0 rgba(255,255,255,0.2);
+}
+.rainbow-text-small {
+    background: linear-gradient(to right, #ff0000, #ff9900, #ffff00, #33cc33);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+}
+.opticals {
+    color: #33ccff; /* Solid color fallback or specific specific blue */
+    -webkit-text-fill-color: #33ccff;
+}
+.subtitle {
+    font-size: 10pt;
+    color: #ffd700; /* Gold */
+    margin: 2px 0 0 0;
+    font-weight: bold;
+}
+
+/* Details Header */
+.header-details {
+    margin-bottom: 15px;
+}
+.detail-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+.label {
+    font-size: 10pt;
+    font-weight: bold;
+    color: #ccc;
+    white-space: nowrap;
+    margin-right: 5px;
+}
+.title-label {
+    color: #66ccff;
+    font-size: 12pt;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.address-line {
+    font-size: 8pt;
+    color: #eee;
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* Input Boxes Style - White rounded rects */
+.input-box {
+    background: #fff;
+    border-radius: 4px; /* Rounded corners */
+    height: 24px;
+    flex-grow: 1;
+    margin-left: 5px;
+    color: #000;
+    font-family: 'Courier New', Courier, monospace; /* Typewriter look */
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    padding: 0 5px;
+    font-size: 11pt;
+}
+.input-box.big {
+    font-size: 14pt;
+    color: #003366;
+}
+.input-box.small {
+    width: 80px;
+    flex-grow: 0;
+}
+
+/* Customer Section */
+.customer-section {
+    margin-bottom: 15px;
+}
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+}
+.form-row .label {
+    width: 90px;
+    flex-shrink: 0;
+    text-align: left;
+}
+
+/* Mid Section */
+.mid-section {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.left-col {
+    width: 65%;
+}
+.right-col {
+    width: 32%;
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+.payments-title {
+    color: #ccc;
+    font-size: 10pt;
+    margin-bottom: 5px;
+    width: 100%;
+    text-align: center;
+}
+.payment-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    justify-content: flex-end;
+}
+
+/* Brands Footer */
+.brands-footer {
+    background: #fff;
+    color: #000;
+    padding: 10px;
+    font-size: 8pt;
+    margin-top: 15px;
+    border-radius: 4px;
+}
+.brand-row {
+    display: flex;
+    border-bottom: 1px solid #ccc;
+    padding: 6px 0;
+}
+.brand-row:last-child {
+    border-bottom: none;
+}
+.brand-row span:first-child {
+    font-weight: bold;
+    width: 110px;
+    border-right: 1px solid #ccc;
+    margin-right: 10px;
+}
+.brand-logos {
+    flex-grow: 1;
+    font-weight: bold;
+    color: #333;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* Signatures */
+.signatures {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    margin-top: 15px;
+    align-items: end;
+}
+.sig-block {
+    text-align: center;
+    font-size: 8pt;
+    color: #ccc;
+    /* Width handled by grid */
+}
+.sig-block:first-child {
+    justify-self: start;
+    text-align: left;
+}
+.sig-block.right {
+    justify-self: end;
+    text-align: right;
+    display: block; /* Alignments handled by text-align & grid */
+}
+/* Ensure pill box aligns with text alignment */
+.sig-block:first-child .sig-box { margin-right: auto; }
+.sig-block.right .sig-box { margin-left: auto; }
+
+.sig-box {
+    background: #fff;
+    height: 25px;
+    width: 100px;
+    border-radius: 12px;
+    margin-top: 2px;
+}
+
+/* QR Wrapper in Grid */
+#qrcode-wrapper {
+    justify-self: center;
+    text-align: center;
+    padding-bottom: 2px; /* Fine tune alignment with baseline */
+}

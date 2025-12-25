@@ -34,9 +34,8 @@ include_once 'header.php';
           </div>
           <div class="col-md-2">
             <select id="limitSelect" class="form-select">
-              <option value="10">Limit: 10</option>
-              <option value="25" selected>Limit: 25</option>
-              <option value="50">Limit: 50</option>
+              <option value="10" selected>Limit: 10</option>
+              <option value="25">Limit: 25</option>
             </select>
           </div>
           <div class="col-md-2">

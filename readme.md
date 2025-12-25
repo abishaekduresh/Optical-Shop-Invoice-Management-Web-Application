@@ -1,6 +1,6 @@
-# 💡 Optical Shop Invoice Management Web Application
+# 💡 Eye Light Opticals - Invoice Management Web Application
 
-A modern web-based **Invoice Management System** built for **Eye Optical Shop** to simplify customer billing, track invoices, and manage user operations securely.  
+A modern web-based **Invoice Management System** built for **Eye Light Opticals** to simplify customer billing, track invoices, and manage user operations securely.  
 This application offers a clean UI, token-based authentication (JWT), and automatic request/response logging for complete operational transparency.
 
 ---
