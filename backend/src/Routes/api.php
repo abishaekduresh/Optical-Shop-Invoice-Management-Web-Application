@@ -64,6 +64,7 @@ return function (App $app) {
      */
     $app->group('/api', function ($group) use ($authController, $invoiceController, $businessController) {
         $group->post('/auth/users/login', [$authController, 'loginUser'])->setName('Users logged in');
+        $group->post('/auth/users/refresh', [$authController, 'refreshToken'])->setName('Refresh Token');
         $group->get('/shared/invoices/{invoiceId}', [$invoiceController, 'getSharedInvoice']);
         // $group->get('/business/stats', [$businessController, 'fetchDashboardStats']);
     })->add(new ActivityLoggerMiddleware());

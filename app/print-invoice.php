@@ -25,8 +25,6 @@ $APP_NAME = AppConfig::APP_NAME ?? 'Eyelight Opticals';
     <div class="no-print control-bar">
         <select id="paperSize" onchange="changePaperSize()">
             <option value="A5">A5</option>
-            <option value="A4">A4</option>
-            <option value="Letter">Letter</option>
         </select>
         <label style="margin-left: 10px; cursor: pointer;">
             <input type="checkbox" id="showQrCheckbox" onchange="toggleQrCode()" checked> Show QR
@@ -141,21 +139,21 @@ $APP_NAME = AppConfig::APP_NAME ?? 'Eyelight Opticals';
         <div class="brands-footer">
             <div class="brand-row">
                 <span>Frames &amp; Sunglasses</span>
-                <div class="brand-logos">
+                <div class="brand-logos" id="frameBrands">
                     <!-- Text or placeholders for brands -->
-                    RAYBAN, VOGUE, POLICE, CARRERA, BOSS...
+                    
                 </div>
             </div>
             <div class="brand-row">
                 <span>Lenses</span>
-                <div class="brand-logos">
-                    ESSILOR, ZEISS, HOYA, KODAK...
+                <div class="brand-logos" id="lensBrands">
+                    
                 </div>
             </div>
             <div class="brand-row">
                 <span>Contact Lenses</span>
-                <div class="brand-logos">
-                    BAUSCH+LOMB, ACUVUE, ALCON...
+                <div class="brand-logos" id="contactBrands">
+                    
                 </div>
             </div>
         </div>

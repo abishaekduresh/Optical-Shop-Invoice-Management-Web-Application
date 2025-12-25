@@ -50,6 +50,7 @@ return function (App $app) {
         $businessController
     ) {
         $group->post('/auth/users/login', [$authController, 'loginUser']);
+        $group->post('/auth/users/refresh', [$authController, 'refreshToken']);
         $group->post('/auth/logout', [$authController, 'logout']);
         $group->get('/users', [$userController, 'getUser']);
         $group->post('/users', [$userController, 'createUser']);

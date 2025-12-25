@@ -30,14 +30,15 @@ class JwtHelper
     /**
      * Generate JWT token
      */
-    public function generateToken(array $claims): string
+    public function generateToken(array $claims, ?int $customTtl = null): string
     {
+        $ttl = $customTtl ?? $this->ttl;
         $unixTimestamp = $this->timestampHelper->getCurrentUnixTimestamp();
         $payload = array_merge($claims, [
             'iat' => $unixTimestamp,
             'nbf' => $unixTimestamp,
             'jti' => $this->uniqueIdHelper->generate(8, ''),
-            'exp' => $unixTimestamp + $this->ttl,
+            'exp' => $unixTimestamp + $ttl,
         ]);
         return JWT::encode($payload, $this->secret, $this->algo);
     }

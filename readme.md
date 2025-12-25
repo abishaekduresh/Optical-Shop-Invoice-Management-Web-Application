@@ -156,7 +156,7 @@ where fresh data and correct routing are critical.
 ## 🧾 Project Information
 
 - **Name:** Optical Shop Invoice Management Web Application
-- **Version:** 2.1
+- **Version:** 2.2
 - **Author:** Abishaek Duresh B
 - **Language:** HTML, JavaScript, CSS, PHP
 - **Library:** Bootstrap 5, Sweetalert2, Tabular JS, Font Awsome
@@ -165,6 +165,7 @@ where fresh data and correct routing are critical.
 
 See detailed version notes:
 
+- [v2.2](documents/v2.2.md)
 - [v2.1](documents/v2.1.md)
 - [v2.0](documents/v2.0.md)
 - [v1.1](documents/v1.1.md)

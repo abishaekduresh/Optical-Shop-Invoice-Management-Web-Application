@@ -112,6 +112,41 @@ class AuthController
         }
     }
 
+    public function refreshToken(Request $request, Response $response, array $args): Response
+    {
+        try {
+            $contentType = $request->getHeaderLine('Content-Type');
+            $payload = [];
+
+            if (stripos($contentType, 'application/json') !== false) {
+                 $payload = json_decode((string) $request->getBody(), true) ?? [];
+            } else {
+                 $payload = $request->getParsedBody() ?? [];
+            }
+
+            $refreshToken = $payload['refreshToken'] ?? null;
+
+            if (!$refreshToken) {
+                return $this->jsonResponse($response, [
+                    'status'   => false,
+                    'message'  => 'Missing refresh token',
+                    'httpCode' => 400,
+                ]);
+            }
+
+            $result = $this->authModel->refreshToken($refreshToken);
+
+            return $this->jsonResponse($response, $result);
+
+        } catch (\Throwable $e) {
+            return $this->jsonResponse($response, [
+                'status'   => false,
+                'message'  => 'Server Error: ' . $e->getMessage(),
+                'httpCode' => 500,
+            ]);
+        }
+    }
+
     /**
      * Normalize uploaded files to simple array
      */

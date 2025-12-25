@@ -6,6 +6,18 @@ This changelog follows the [Keep a Changelog](https://keepachangelog.com/en/1.1.
 
 ---
 
+## [v2.2] - 2025-12-26
+
+### 🚀 Added
+- **JWT Auto-Refresh**: Implemented 7-day refresh token system to prevent frequent logouts. Frontend automatically renews session on 401 errors.
+- **Dynamic Invoice Footer**: Footer brand sections now auto-populate with specific invoice data (`frame`, `lence`) instead of static text.
+
+### 🛠 Fixed
+- **Authentication**: Fixed session expiry causing forced logouts every hour.
+- **Print Layout**: Reverted print toolbar to classic design and locked paper size to A5 as preferred.
+
+---
+
 ## [v2.1] - 2025-12-26
 
 ### 🚀 Added

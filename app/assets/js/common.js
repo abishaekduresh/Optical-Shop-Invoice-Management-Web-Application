@@ -132,27 +132,40 @@ function apiRequest(
       clearTimeout(debounceTimers[loaderKey]);
       Swal.close();
 
-      let errorMessage = "Something went wrong!";
-      try {
-        // Try to extract JSON message safely
-        const res = xhr.responseJSON || JSON.parse(xhr.responseText);
-        errorMessage = res.message || errorMessage;
-      } catch {
-        // Fallback: show plain response or generic message
-        if (xhr.responseText?.startsWith("<!DOCTYPE")) {
-          errorMessage = "Server returned an unexpected HTML response.";
-        } else if (xhr.responseText) {
-          errorMessage = xhr.responseText;
-        }
+      // --- Auto Refresh Token Logic ---
+      if (xhr.status === 401 && !url.includes("/auth/users/login") && !url.includes("/auth/users/refresh")) {
+          const refreshToken = localStorage.getItem("refreshToken");
+          if (refreshToken) {
+               // Simple lock to prevent multiple refresh calls if parallel requests fail
+               // ideally we'd queue them, but this is a basic implementation
+               console.log("Token expired. Attempting refresh...");
+               
+               $.ajax({
+                   url: BASE_API_URL + "/auth/users/refresh",
+                   type: "POST",
+                   contentType: "application/json",
+                   data: JSON.stringify({ refreshToken: refreshToken }),
+                   success: function (res) {
+                       console.log("Token refreshed.");
+                       // Retry the original request
+                       // Note: recursion here is safe because if it fails again 401, 
+                       // it might try to refresh again. We could add a retry count param to avoid infinite loops.
+                       apiRequest(method, url, data, isFormData, onSuccess, onError);
+                   },
+                   error: function (err) {
+                       console.error("Refresh failed.", err);
+                       localStorage.removeItem("refreshToken"); // Clear invalid token
+                       // Fallback to standard error handling
+                       doErrorHandling(xhr, status, error, onError);
+                       // Redirect to login
+                       setTimeout(() => { window.location.href = HOST_ROUTE_PATH + "/login"; }, 1000);
+                   }
+               });
+               return; // Stop here, don't show error alert yet
+          }
       }
 
-      Swal.fire({
-        icon: "error",
-        title: "Request Failed",
-        text: errorMessage,
-      });
-
-      if (onError) onError(xhr, status, error);
+      doErrorHandling(xhr, status, error, onError);
     },
   };
 
@@ -170,6 +183,34 @@ function apiRequest(
 
   // Execute
   $.ajax(ajaxOptions);
+}
+
+function doErrorHandling(xhr, status, error, onError) {
+      if (onError) {
+           onError(xhr, status, error);
+           return;
+      }
+
+      let errorMessage = "Something went wrong!";
+      try {
+        // Try to extract JSON message safely
+        const res = xhr.responseJSON || JSON.parse(xhr.responseText);
+        errorMessage = res.message || errorMessage;
+      } catch {
+        // Fallback: show plain response or generic message
+        if (xhr.responseText?.startsWith("<!DOCTYPE")) {
+          errorMessage = "Server returned an unexpected HTML response.";
+        } else if (xhr.responseText) {
+          errorMessage = xhr.responseText;
+        }
+      }
+
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: errorMessage,
+        confirmButtonText: "OK",
+      });
 }
 
 // Convert apiRequest into Promise wrapper

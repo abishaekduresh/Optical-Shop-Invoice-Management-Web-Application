@@ -79,6 +79,41 @@ class AuthController
     }
 
     /**
+     * Handle refresh token request
+     */
+    public function refreshToken(Request $request, Response $response, array $args): Response
+    {
+        try {
+            $contentType = $request->getHeaderLine('Content-Type');
+            $payload = [];
+
+            // Parse JSON payload
+            if (stripos($contentType, 'application/json') !== false) {
+                $payload = json_decode((string) $request->getBody(), true) ?? [];
+            } else {
+                 // Or multipart, but refreshToken usually JSON
+                 $payload = $request->getParsedBody() ?? [];
+            }
+
+            // Call backend API
+            $apiUrl = rtrim($this->backendApiUrl, '/') . '/api/auth/users/refresh';
+            $result = $this->apiHelper->request($apiUrl, 'POST', $payload);
+
+            // Forward API response exactly as-is
+            return $this->apiHelper->jsonResponse($response, $result);
+
+        } catch (\Throwable $e) {
+            return $this->apiHelper->jsonResponse($response, [
+                'status'    => false,
+                'httpCode'  => 500,
+                'body'      => null,
+                'headers'   => [],
+                'error'     => 'Server Error: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
      * Logout user by expiring the JWT cookie
      */
     public function logout(Request $request, Response $response, array $args): Response

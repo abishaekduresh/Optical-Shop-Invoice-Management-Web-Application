@@ -64,6 +64,21 @@ $(document).ready(function () {
                   JSON.stringify(businessResponse.data.records[0])
                 );
 
+                // Store Refresh Token (if available)
+                if (response.data && response.refreshToken) {
+                    localStorage.setItem("refreshToken", response.refreshToken);
+                } else if (response.refreshToken) {
+                     localStorage.setItem("refreshToken", response.refreshToken);
+                } else if (response.data && response.data.refreshToken) {
+                     // Check wherever it might be nested
+                     localStorage.setItem("refreshToken", response.data.refreshToken);
+                }
+                // Actually, looking at AuthModel, it returns 'refreshToken' at top level of array.
+                // So response.refreshToken should be it.
+                if (response.refreshToken) {
+                    localStorage.setItem("refreshToken", response.refreshToken);
+                }
+
                 Swal.fire({
                   toast: true,
                   position: "top-end",

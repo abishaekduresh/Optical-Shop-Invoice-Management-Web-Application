@@ -103,6 +103,31 @@ $(document).ready(function() {
                     $('#payCard').text('✔');
                 }
 
+                // Populate Brands Footer using Invoice Data
+                // As per user request, use 'frame' and 'lence' fields from API result.
+                
+                // Frames
+                if (invoice.frame) {
+                    $('#frameBrands').text(invoice.frame);
+                } else {
+                    $('#frameBrands').text('-'); // or keep empty
+                }
+
+                // Lenses (API field is 'lence' per DB schema)
+                if (invoice.lence) {
+                    $('#lensBrands').text(invoice.lence);
+                } else {
+                     $('#lensBrands').text('-');
+                }
+
+                // Contact Lenses - Try 'contact_lence' if it exists, roughly inferred similar naming
+                // If not present in API, we'll leave it empty or default.
+                if (invoice.contact_lence) {
+                    $('#contactBrands').text(invoice.contact_lence);
+                } else {
+                    $('#contactBrands').text(''); 
+                }
+
                 // Generate QR Code
                 $('#qrcode').empty(); // clear if any
                 if(invoice.invoiceId) {

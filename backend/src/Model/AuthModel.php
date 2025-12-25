@@ -70,10 +70,20 @@ class AuthModel
             }
             
             $jwtHelper = new JwtHelper($_ENV['JWT_SECRET'], $_ENV['JWT_ALGO'], $_ENV['JWT_EXPIRY']);
+            
+            // Access Token (Use Configured Expiry or Default 1h)
             $token = $jwtHelper->generateToken([
                 "sub"  => $user['user_id'],
-                "busid" => $user['business_id'] ?? null
+                "busid" => $user['business_id'] ?? null,
+                "type" => "access"
             ]);
+
+            // Refresh Token (7 Days)
+            $refreshToken = $jwtHelper->generateToken([
+                "sub"  => $user['user_id'],
+                "busid" => $user['business_id'] ?? null,
+                "type" => "refresh"
+            ], 604800); // 7 * 24 * 60 * 60
 
             // Successful login
             return [
@@ -85,7 +95,8 @@ class AuthModel
                     'userId' => $user['user_id'],
                     'name'   => $user['name'],
                 ],
-                'jwtToken'  => $token,
+                'jwtToken'      => $token,
+                'refreshToken'  => $refreshToken
             ];
 
         } catch (PDOException $e) {
@@ -97,5 +108,53 @@ class AuthModel
         } finally {
             $this->pdo->disconnect();
         }
+    }
+
+    /**
+     * Refresh Access Token
+     */
+    public function refreshToken(string $refreshToken): array
+    {
+        $jwtHelper = new JwtHelper($_ENV['JWT_SECRET'], $_ENV['JWT_ALGO'], $_ENV['JWT_EXPIRY']);
+        
+        // Verify Token
+        $verification = $jwtHelper->verifyToken($refreshToken);
+
+        if (!$verification['status']) {
+            return [
+                'status'   => false,
+                'message'  => 'Invalid or expired refresh token',
+                'httpCode' => 401
+            ];
+        }
+
+        $data = $verification['data'];
+        
+        // Ensure it is a refresh token
+        if (isset($data['jwt']->type) && $data['jwt']->type !== 'refresh') {
+             return [
+                'status'   => false,
+                'message'  => 'Invalid token type',
+                'httpCode' => 401
+            ];
+        }
+
+        // Generate NEW Access Token
+        $newAccessToken = $jwtHelper->generateToken([
+            "sub"  => $data['userId'],
+            "busid" => $data['businessId'],
+            "type" => "access"
+        ]);
+
+        return [
+            'status'   => true,
+            'message'  => 'Token refreshed successfully',
+            'httpCode' => 200,
+            'data'     => [
+                'businessId' => $data['businessId'],
+                'userId' => $data['userId'],
+            ],
+            'jwtToken' => $newAccessToken
+        ];
     }
 }
