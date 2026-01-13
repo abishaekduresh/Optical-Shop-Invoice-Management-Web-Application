@@ -94,6 +94,7 @@ $APP_NAME = AppConfig::APP_NAME ?? null;
         <a href="<?= $base_url ?>#" class="nav-link dropdown-toggle"><i class="fa-solid fa-chart-line"></i> Reports</a>
         <div class="submenu">
           <a href="<?= $base_url ?>report/invoices">Invoices</a>
+          <a href="<?= $base_url ?>report/advanced-invoices">Advanced Invoices</a>
           <!-- <a href="<?= $base_url ?>monthly-report">Monthly Report</a>
           <a href="<?= $base_url ?>yearly-report">Yearly Report</a> -->
         </div>
@@ -131,6 +132,7 @@ $APP_NAME = AppConfig::APP_NAME ?? null;
 
             <div class="submenu ps-4" style="margin-top: -4px;">
                 <a href="<?= $base_url ?>report/invoices" class="text-white-50 py-1 d-block">Invoices</a>
+                <a href="<?= $base_url ?>report/advanced-invoices" class="text-white-50 py-1 d-block">Advanced Invoices</a>
                 <!-- <a href="<?= $base_url ?>monthly-report" class="text-white-50 py-1 d-block">Monthly Report</a>
                 <a href="<?= $base_url ?>yearly-report" class="text-white-50 py-1 d-block">Yearly Report</a> -->
             </div>

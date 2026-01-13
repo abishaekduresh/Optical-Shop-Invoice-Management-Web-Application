@@ -210,4 +210,27 @@ class InvoiceController
             ]);
         }
     }
+
+    public function getAdvancedInvoice(Request $request, Response $response, array $args): Response
+    {
+        try {
+            $payload = $request->getQueryParams();
+
+            // Call backend API
+            // Note: Core backend route is /api/advanced-invoices
+            $apiUrl = rtrim($this->backendApiUrl, '/') . '/api/advanced-invoices';
+            $result = $this->apiHelper->request($apiUrl, 'GET', [], [], $payload);
+
+            return $this->apiHelper->jsonResponse($response, $result);
+
+        } catch (\Throwable $e) {
+            return $this->apiHelper->jsonResponse($response, [
+                'status'    => false,
+                'httpCode'  => 500,
+                'body'      => null,
+                'headers'   => [],
+                'error'     => 'Server Error: ' . $e->getMessage()
+            ]);
+        }
+    }
 }

@@ -34,7 +34,6 @@ $(document).ready(function () {
       payload,
       false,
       function (response) {
-        console.log(response);
         const msg =
           response.message ||
           (response.body && response.body.message) ||

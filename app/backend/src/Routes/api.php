@@ -61,6 +61,7 @@ return function (App $app) {
         $group->post('/invoices', [$invoiceController, 'createInvoice']);
         $group->put('/invoices/{invoiceId}', [$invoiceController, 'updateInvoice']);
         $group->delete('/invoices/{invoiceId}', [$invoiceController, 'deleteInvoice']);
+        $group->get('/advanced-invoices', [$invoiceController, 'getAdvancedInvoice']);
         // Business
         $group->get('/business', [$businessController, 'getBusiness']);
         $group->post('/business', [$businessController, 'createBusiness']);

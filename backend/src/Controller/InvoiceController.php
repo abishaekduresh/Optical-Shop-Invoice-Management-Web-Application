@@ -409,6 +409,29 @@ class InvoiceController
         }
     }
 
+    public function getAdvancedInvoice(Request $request, Response $response, array $args): Response 
+    {
+        $queryParams = $request->getQueryParams();
+        
+        // Decode 'filters' JSON string if present
+        $filters = [];
+        if (!empty($queryParams['filters'])) {
+            $decoded = json_decode($queryParams['filters'], true);
+            if (is_array($decoded)) {
+                $filters = $decoded;
+            }
+        }
+
+        $data = [
+            'filters' => $filters,
+            'page'    => (int)($queryParams['page'] ?? 1),
+            'limit'   => (int)($queryParams['limit'] ?? 25),
+        ];
+
+        $result = $this->invoiceModel->getAdvancedInvoice($data);
+        return $this->jsonResponse($response, $result);
+    }
+
     public function getSharedInvoice(Request $request, Response $response, array $args): Response 
     {
         $queryParams = $request->getQueryParams();

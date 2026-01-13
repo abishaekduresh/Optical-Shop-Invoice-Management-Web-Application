@@ -760,6 +760,12 @@ Thank you!
             });
           },
           (xhr) => {
+            // Handle "No results" (409) as a valid empty set, not an error
+            if (xhr.status === 409) {
+              success({ results: [] });
+              return;
+            }
+
             let message = "Error fetching customers.";
             if (xhr.responseText) {
               try {
@@ -789,6 +795,20 @@ Thank you!
     allowClear: true,
     tags: true, // Allow custom values
     dropdownParent: $("#createInvoiceStaticBackdropModal"),
+    language: {
+      noResults: function () {
+        return "No results found. Press Enter to add new.";
+      },
+    },
+    createTag: function (params) {
+      const term = $.trim(params.term);
+      if (term === "") return null;
+      return {
+        id: term,
+        text: term,
+        newTag: true,
+      };
+    },
     ajax: {
       transport: function (params, success, failure) {
         const searchTerm = params.data.term || "";
@@ -819,6 +839,11 @@ Thank you!
             success({ results: results.slice(0, 5) });
           },
           (xhr) => {
+            // Handle "No results" (409) as a valid empty set, not an error
+            if (xhr.status === 409) {
+              success({ results: [] });
+              return;
+            }
             console.error("Place fetch error:", xhr);
             failure();
           }
@@ -837,6 +862,20 @@ Thank you!
     allowClear: true,
     tags: true, // Allow custom values
     dropdownParent: $("#updateInvoiceModal"),
+    language: {
+      noResults: function () {
+        return "No results found. Press Enter to add new.";
+      },
+    },
+    createTag: function (params) {
+      const term = $.trim(params.term);
+      if (term === "") return null;
+      return {
+        id: term,
+        text: term,
+        newTag: true,
+      };
+    },
     ajax: {
       transport: function (params, success, failure) {
         const searchTerm = params.data.term || "";
@@ -867,6 +906,11 @@ Thank you!
             success({ results: results.slice(0, 5) });
           },
           (xhr) => {
+            // Handle "No results" (409) as a valid empty set, not an error
+            if (xhr.status === 409) {
+              success({ results: [] });
+              return;
+            }
             console.error("Place fetch error:", xhr);
             failure();
           }
@@ -894,6 +938,7 @@ Thank you!
       return;
     }
 
+    // Check if it's a new tag (custom entry) where name is undefined
     $("#createInvoiceName").val(selectedItem.name || "");
     $("#createInvoicePhone").val(selectedItem.phone || "");
     $("#createInvoiceName").val(selectedItem.name || "");
@@ -1019,6 +1064,7 @@ function generateOpticalValues(type) {
     // You didn't request 'via' but including for completeness
     case "via":
       values = ["6/60", "6/36", "6/24", "6/18", "6/12", "6/9", "6/6"];
+      values.reverse();
       break;
 
     default:

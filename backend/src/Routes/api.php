@@ -108,6 +108,9 @@ return function (App $app) {
         $group->post('/invoices', [$invoiceController, 'createInvoice']);
         $group->put('/invoices/{invoiceId}', [$invoiceController, 'updateInvoice']);
         $group->delete('/invoices/{invoiceId}', [$invoiceController, 'deleteInvoice']);
+        // Reports
+        // Reports
+        $group->get('/advanced-invoices', [$invoiceController, 'getAdvancedInvoice']);
 
         // Business routes
         $group->get('/business', [$businessController, 'getBusiness']);

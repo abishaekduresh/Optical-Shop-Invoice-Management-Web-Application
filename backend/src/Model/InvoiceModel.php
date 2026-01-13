@@ -593,6 +593,137 @@ class InvoiceModel
         }
     }
 
+    public function getAdvancedInvoice(array $data): array
+    {
+        $conn = $this->pdo->getConnection();
+        try {
+            $filters = $data['filters'] ?? [];
+            $page    = $data['page'];
+            $limit   = $data['limit'];
+            $offset  = ($page - 1) * $limit;
+
+            $where = " WHERE 1=1 ";
+            $params = [];
+            
+            // Allow list for safety
+            $allowedCols = [
+                'invoice_date'   => 'i.invoice_date',
+                'amount'         => 'i.amount',
+                'invoice_status' => 'i.invoice_status',
+                'name'           => 'i.name',
+                'phone'          => 'i.phone',
+                'payment_mode'   => 'i.payment_mode',
+                'place'          => 'i.place',
+                'invoice_type'   => 'i.invoice_type',
+            ];
+            
+            $allowedOps = ['=', '>', '<', '>=', '<=', '!=', 'LIKE'];
+
+            // Loop through filters
+            foreach ($filters as $index => $f) {
+                // $f = {col, op, val}
+                $colKey = $f['col'] ?? '';
+                $op     = strtoupper($f['op'] ?? '');
+                $val    = $f['val'] ?? '';
+
+                if (isset($allowedCols[$colKey]) && in_array($op, $allowedOps)) {
+                    $columnName = $allowedCols[$colKey];
+                    // Create unique param key per filter row
+                    $paramKey = ":v{$index}";
+
+                    // Handle LIKE
+                    if ($op === 'LIKE') {
+                        $where .= " AND $columnName LIKE $paramKey";
+                        $params[$paramKey] = "%{$val}%";
+                    } else {
+                        $where .= " AND $columnName $op $paramKey";
+                        $params[$paramKey] = $val;
+                    }
+                }
+            }
+            
+            // Always exclude deleted unless specified? 
+            // The requirement implies fully flexible, but let's assume if status NOT in filters, show active only?
+            // Actually, dynamic usually implies "what you see is what you get". 
+            // If user didn't ask for "status = active", maybe they WANT all?
+            // Let's stick to pure dynamic. If they want active, they add "Status = active".
+            // BUT, usually we hide "deleted". Let's add "AND invoice_status != 'deleted'" if not explicitly overridden?
+            // User said "Row Filter System". If they add "Status = deleted", they can see it. 
+            // I will force exclude deleted ONLY if status col isn't used? No, keep it simple.
+            // Wait, existing logic usually hides deleted. I'll hide deleted by default for safety.
+            // Let's filter out deleted unless user explicitly asks for status.
+            
+            $statusFilterPresent = false;
+            foreach($filters as $f) { if(($f['col']??'') === 'invoice_status') $statusFilterPresent = true; }
+            if(!$statusFilterPresent) {
+                 $where .= " AND i.invoice_status != 'deleted'";
+            }
+
+            // --- Count Total ---
+            $countQuery = "SELECT COUNT(*) FROM invoices i " . $where;
+            $stmt = $conn->prepare($countQuery);
+            $stmt->execute($params);
+            $totalRecords = (int)$stmt->fetchColumn();
+
+            if ($totalRecords === 0) {
+                 return [
+                    'status' => true,
+                    'httpCode' => 200,
+                    'data' => ['invoices' => []],
+                    'pagination' => [
+                        'totalRecords' => 0,
+                        'currentPage'  => $page
+                    ]
+                 ];
+            }
+
+            // --- Fetch Data ---
+            $sql = "SELECT i.* FROM invoices i " . $where . " ORDER BY i.invoice_date DESC LIMIT :offset, :limit";
+            $stmt = $conn->prepare($sql);
+            foreach ($params as $k => $v) {
+                $stmt->bindValue($k, $v);
+            }
+            $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+            $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
+            $stmt->execute();
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            // Format
+            $invoices = array_map(function ($row) {
+                return [
+                    'invoiceId'     => $row['invoice_id'],
+                    'invoiceNumber' => $row['invoice_number'],
+                    'invoiceDate'   => $row['invoice_date'],
+                    'name'          => $row['name'],
+                    'phone'         => $row['phone'],
+                    'place'         => $row['place'],
+                    'amount'        => $row['amount'],
+                    'invoiceStatus' => $row['invoice_status'],
+                    'invoiceType'   => $row['invoice_type'],
+                    'paymentMode'   => $row['payment_mode']
+                ];
+            }, $rows);
+            
+             return [
+                'status'   => true,
+                'httpCode' => 200,
+                'message'  => 'Report generated',
+                'data'     => ['invoices' => $invoices],
+                'pagination' => [
+                    'currentPage'  => $page,
+                    'limit'        => $limit,
+                    'totalPages'   => ceil($totalRecords / $limit),
+                    'totalRecords' => $totalRecords,
+                ],
+            ];
+
+        } catch (\PDOException $e) {
+            return ['status' => false, 'httpCode' => 500, 'message' => 'DB Error: ' . $e->getMessage()];
+        } finally {
+            $this->pdo->disconnect();
+        }
+    }
+
     public function getSharedInvoice(array $data)
     {
         $conn = $this->pdo->getConnection();

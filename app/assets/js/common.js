@@ -8,8 +8,8 @@
 // 🌍 Global Constants
 // -------------------------
 const HOST_URL = window.location.origin;
-const HOST_ROUTE_PATH = "/app"; // Adjust if needed
-const BASE_API_URL = `${HOST_URL}${HOST_ROUTE_PATH}/backend/public`;
+const HOST_ROUTE_PATH = "/app"; // change if your app is in a different subfolder
+const BASE_API_URL = `${HOST_URL}${HOST_ROUTE_PATH.replace(/\/$/, "")}/backend/public`;
 
 // -------------------------
 // ⚠️ Right-Click & DevTools Protection

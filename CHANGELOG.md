@@ -6,7 +6,18 @@ This changelog follows the [Keep a Changelog](https://keepachangelog.com/en/1.1.
 
 ---
 
-## [v2.2] - 2025-12-26
+## [v2.3] - 2026-01-13
+
+### 🚀 Added
+- **Advanced Invoice Report**: New dynamic reporting module with "Row Filter System".
+- **Dynamic Queries**: Build custom filters using Column, Operator, and Value rows.
+- **Enhanced Searching**: Support for `LIKE`, `>`, `<`, etc. on multiple fields (Amount, Date, Status, etc.).
+- **Backend**: Implemented dynamic SQL query builder in `InvoiceModel`.
+
+### 💅 UI Updates
+- **Filter Interface**: New clean UI for adding/removing filter conditions dynamically.
+
+---
 
 ### 🚀 Added
 - **JWT Auto-Refresh**: Implemented 7-day refresh token system to prevent frequent logouts. Frontend automatically renews session on 401 errors.
